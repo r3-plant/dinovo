@@ -1,0 +1,877 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>checklist</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
+      --green: #2f9e44;
+      --green-soft: #d9f7d1;
+      --orange: #f97316;
+      --orange-soft: #ffd9b3;
+      --gray-soft: #dedede;
+      --habit-blue: #2f66ff;
+      --habit-blue-soft: #dce8ff;
+      --habit-blue-deep: #2149c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: clamp(34px, 4vw, 58px);
+      letter-spacing: 2px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: clamp(18px, 2vw, 28px);
+      color: var(--muted);
+    }
+
+    .main {
+      position: relative;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: linear-gradient(90deg, var(--green-soft) 0%, #e9f6e4 20%, var(--gray-soft) 50%, #f6e0bf 76%, var(--orange-soft) 100%);
+      min-height: 720px;
+      padding: 26px;
+    }
+
+    .habits-bubble {
+      background: linear-gradient(180deg, #09173d 0%, #103c73 52%, #0d77a6 100%);
+      color: #ffffff;
+      border-radius: 22px;
+      padding: 20px 22px 22px;
+      box-shadow: 0 10px 24px rgba(33, 73, 199, 0.20);
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .habits-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .habits-title {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .habits-title h2 {
+      font-size: clamp(22px, 2.4vw, 32px);
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .habits-title p {
+      font-size: clamp(14px, 1.6vw, 18px);
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .habits-line {
+      width: 100%;
+      height: 2px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.42);
+      margin-top: 18px;
+      margin-bottom: 18px;
+    }
+
+    .habits-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .habit-item {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-radius: 18px;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 18px;
+      box-shadow: none;
+      border: none;
+      backdrop-filter: blur(6px);
+    }
+
+    .habit-item.completed .habit-text {
+      text-decoration: line-through;
+      opacity: 0.62;
+    }
+
+    .habit-text {
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: 0.2px;
+    }
+
+    .habit-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .habit-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      flex: 0 0 auto;
+      box-shadow: 0 0 0 5px rgba(255,255,255,0.08);
+    }
+
+    .habit-confirm {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.14);
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: none;
+      box-shadow: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .habit-confirm:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.20);
+    }
+
+    .days {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .day-card {
+      background: rgba(255, 255, 255, 0.20);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+      backdrop-filter: blur(3px);
+    }
+
+    .day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+      padding: 0 2px;
+    }
+
+    .day-header h2 {
+      font-size: clamp(22px, 2.5vw, 34px);
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(31, 41, 55, 0.92);
+    }
+
+    .day-header .day-badge {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: rgba(31, 41, 55, 0.54);
+      background: rgba(255,255,255,0.55);
+      border-radius: 999px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .day-shifts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .shift {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 8px 6px;
+      min-width: 0;
+      background: rgba(255,255,255,0.15);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.30);
+    }
+
+    .title-area {
+      text-align: center;
+      margin-bottom: 18px;
+      width: 100%;
+    }
+
+    .icon {
+      display: block;
+      font-size: 42px;
+      line-height: 1;
+      margin-bottom: 8px;
+      user-select: none;
+    }
+
+    .morning .icon,
+    .morning .shift-title,
+    .morning .line,
+    .morning .accent {
+      color: var(--green);
+    }
+
+    .afternoon .icon,
+    .afternoon .shift-title,
+    .afternoon .line,
+    .afternoon .accent {
+      color: var(--orange);
+    }
+
+    .shift-title {
+      font-size: clamp(22px, 2.6vw, 32px);
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      text-transform: lowercase;
+    }
+
+    .shift-subtitle {
+      font-size: clamp(14px, 1.6vw, 18px);
+      color: rgba(31, 41, 55, 0.62);
+      margin-bottom: 18px;
+    }
+
+    .line {
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      opacity: 0.95;
+    }
+
+    .task-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 22px;
+      flex: 1;
+      min-height: 80px;
+    }
+
+    .task {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 14px;
+      min-height: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 16px 16px 18px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255,255,255,0.9);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .task.dragging {
+      opacity: 0.45;
+      cursor: grabbing;
+    }
+
+    .task.completed .task-text {
+      text-decoration: line-through;
+      opacity: 0.58;
+    }
+
+    .task-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .check-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 4px solid currentColor;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      background: #ffffff;
+      color: inherit;
+      position: relative;
+    }
+
+    .check-wrap input {
+      width: 0;
+      height: 0;
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .check-mark {
+      width: 12px;
+      height: 22px;
+      border-right: 5px solid currentColor;
+      border-bottom: 5px solid currentColor;
+      opacity: 0;
+      transform: rotate(45deg) translate(-1px, -2px);
+      border-radius: 1px;
+    }
+
+    .task.completed .check-mark {
+      opacity: 1;
+    }
+
+    .habits-bubble .check-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      position: relative;
+      color: #ffffff;
+    }
+
+    .habits-bubble .check-mark {
+      width: 14px;
+      height: 24px;
+      border-right: 5px solid currentColor;
+      border-bottom: 5px solid currentColor;
+      opacity: 0;
+      transform: rotate(45deg) translate(-1px, -2px);
+      border-radius: 1px;
+    }
+
+    .task-text {
+      font-size: clamp(18px, 2vw, 27px);
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu {
+      font-size: 34px;
+      color: #9ca3af;
+      line-height: 1;
+      flex: 0 0 auto;
+      cursor: grab;
+      padding: 8px 2px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .add-btn,
+    .clear-btn {
+      border: 2px solid currentColor;
+      background: rgba(255,255,255,0.18);
+      color: inherit;
+      border-radius: 12px;
+      padding: 13px 20px;
+      font-size: 19px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    .add-btn:hover,
+    .clear-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.36);
+    }
+
+    .add-btn span,
+    .clear-btn span {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .empty-state {
+      display: none;
+      width: 100%;
+      padding: 18px;
+      border: 1px dashed rgba(31, 41, 55, 0.20);
+      border-radius: 14px;
+      text-align: center;
+      color: rgba(31, 41, 55, 0.55);
+      font-size: 18px;
+      margin-top: 18px;
+      background: rgba(255,255,255,0.35);
+    }
+
+    .empty-state.show {
+      display: block;
+    }
+
+    .drop-zone {
+      outline: 2px dashed rgba(31, 41, 55, 0.18);
+      outline-offset: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 15px;
+      min-height: 18px;
+    }
+
+    .footer strong {
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      .day-shifts {
+        grid-template-columns: 1fr;
+      }
+
+      .main {
+        min-height: auto;
+      }
+
+      .shift {
+        padding-bottom: 20px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 14px;
+      }
+
+      .main {
+        padding: 18px;
+      }
+
+      .task {
+        min-height: 74px;
+      }
+
+      .task-text {
+        font-size: 18px;
+      }
+
+      .menu {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1>j u s t - d o</h1>
+      <p>as if you could actually do all that &gt;-&lt;</p>
+    </header>
+
+    <main class="main">
+      <section class="habits-bubble" aria-labelledby="habits-title">
+        <div class="habits-top">
+          <div class="habits-title">
+            <h2 id="habits-title">habits</h2>
+            <p>small things, every day</p>
+          </div>
+        </div>
+        <div class="habits-line"></div>
+        <div class="habits-list" id="habits-list"></div>
+      </section>
+
+      <div class="days" id="days-root"></div>
+    </main>
+
+    <div class="footer" id="footer-text"></div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "checklist-day-template-v3";
+
+    const dayOrder = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ];
+
+    const dayLabels = {
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
+      sunday: "Sunday",
+    };
+
+    const periodLabels = {
+      morning: "morning",
+      afternoon: "afternoon",
+    };
+
+    const state = {
+      habits: [
+        { id: cryptoId(), text: "read 5 pages", done: false }
+      ],
+      days: Object.fromEntries(
+        dayOrder.map((day) => [
+          day,
+          {
+            morning: [],
+            afternoon: [],
+          },
+        ])
+      ),
+    };
+
+    let dragState = { taskId: null, day: null, period: null };
+
+    function cryptoId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return "id-" + Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.days && parsed.habits) {
+          state.habits = parsed.habits;
+          for (const day of dayOrder) {
+            if (!parsed.days[day]) continue;
+            state.days[day].morning = Array.isArray(parsed.days[day].morning) ? parsed.days[day].morning : [];
+            state.days[day].afternoon = Array.isArray(parsed.days[day].afternoon) ? parsed.days[day].afternoon : [];
+          }
+        }
+      } catch (err) {
+        console.warn("Não foi possível carregar o estado:", err);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function render() {
+      renderHabits();
+      renderDays();
+      saveState();
+      bindColumnDrops();
+    }
+
+    function renderHabits() {
+      const list = document.getElementById("habits-list");
+      list.innerHTML = "";
+
+      state.habits.forEach((habit) => {
+        const el = document.createElement("div");
+        el.className = "habit-item" + (habit.done ? " completed" : "");
+        el.dataset.id = habit.id;
+
+        el.innerHTML = `
+          <div class="habit-left">
+            <span class="habit-dot" aria-hidden="true"></span>
+            <span class="habit-text"></span>
+          </div>
+          <label class="habit-confirm check-wrap" aria-label="Marcar hábito como concluído">
+            <input type="checkbox" ${habit.done ? "checked" : ""} />
+            <span class="check-mark"></span>
+          </label>
+        `;
+
+        el.querySelector(".habit-text").textContent = habit.text;
+        const checkbox = el.querySelector("input[type='checkbox']");
+        checkbox.addEventListener("change", () => toggleHabitDone(habit.id));
+
+        list.appendChild(el);
+      });
+    }
+
+    function renderDays() {
+      const root = document.getElementById("days-root");
+      root.innerHTML = "";
+
+      dayOrder.forEach((day) => {
+        const card = document.createElement("section");
+        card.className = "day-card";
+        card.dataset.day = day;
+
+        card.innerHTML = `
+          <div class="day-header">
+            <h2>${dayLabels[day]}</h2>
+            <div class="day-badge">day</div>
+          </div>
+          <div class="day-shifts">
+            <div class="shift morning" data-day="${day}" data-period="morning">
+              <div class="title-area">
+                <span class="icon">☀</span>
+                <div class="shift-title">morning</div>
+                <div class="shift-subtitle">first things first</div>
+                <div class="line"></div>
+              </div>
+
+              <div class="task-list" id="${day}-morning-list"></div>
+              <div class="empty-state" id="${day}-morning-empty">No tasks yet.</div>
+
+              <div class="controls">
+                <button class="add-btn" data-add-day="${day}" data-add-period="morning"><span>+</span> new</button>
+                <button class="clear-btn" data-clear-day="${day}" data-clear-period="morning"><span>×</span>clean</button>
+              </div>
+            </div>
+
+            <div class="shift afternoon" data-day="${day}" data-period="afternoon">
+              <div class="title-area">
+                <span class="icon">☀</span>
+                <div class="shift-title">afternoon</div>
+                <div class="shift-subtitle">keep it moving</div>
+                <div class="line"></div>
+              </div>
+
+              <div class="task-list" id="${day}-afternoon-list"></div>
+              <div class="empty-state" id="${day}-afternoon-empty">No tasks yet.</div>
+
+              <div class="controls">
+                <button class="add-btn" data-add-day="${day}" data-add-period="afternoon"><span>+</span> new</button>
+                <button class="clear-btn" data-clear-day="${day}" data-clear-period="afternoon"><span>×</span>clean</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        root.appendChild(card);
+        renderShift(day, "morning");
+        renderShift(day, "afternoon");
+      });
+    }
+
+    function renderShift(day, period) {
+      const list = document.getElementById(`${day}-${period}-list`);
+      const empty = document.getElementById(`${day}-${period}-empty`);
+      list.innerHTML = "";
+
+      const tasks = state.days[day][period];
+      empty.classList.toggle("show", tasks.length === 0);
+
+      tasks.forEach((task) => {
+        const el = document.createElement("div");
+        el.className = "task" + (task.done ? " completed" : "");
+        el.draggable = true;
+        el.dataset.id = task.id;
+        el.dataset.day = day;
+        el.dataset.period = period;
+
+        el.innerHTML = `
+          <div class="task-left">
+            <label class="check-wrap" aria-label="Marcar tarefa como concluída">
+              <input type="checkbox" ${task.done ? "checked" : ""} />
+              <span class="check-mark"></span>
+            </label>
+            <span class="task-text"></span>
+          </div>
+          <div class="menu" title="Arraste para mover">⋮</div>
+        `;
+
+        el.querySelector(".task-text").textContent = task.text;
+        const checkbox = el.querySelector("input[type='checkbox']");
+        checkbox.addEventListener("change", () => toggleTaskDone(day, period, task.id));
+
+        el.addEventListener("dragstart", onDragStart);
+        el.addEventListener("dragend", onDragEnd);
+        el.addEventListener("dragover", onDragOverTask);
+        el.addEventListener("drop", onDropTask);
+
+        list.appendChild(el);
+      });
+    }
+
+    function toggleHabitDone(id) {
+      const habit = state.habits.find((item) => item.id === id);
+      if (!habit) return;
+      habit.done = !habit.done;
+      render();
+    }
+
+    function toggleTaskDone(day, period, id) {
+      const task = state.days[day][period].find((item) => item.id === id);
+      if (!task) return;
+      task.done = !task.done;
+      render();
+    }
+
+    function addTask(day, period) {
+      const text = prompt("Digite o nome da tarefa:", "New task");
+      if (!text || !text.trim()) return;
+      state.days[day][period].push({ id: cryptoId(), text: text.trim(), done: false });
+      render();
+    }
+
+    function clearCompleted(day, period) {
+      state.days[day][period] = state.days[day][period].filter((task) => !task.done);
+      render();
+    }
+
+    function moveTask(taskId, fromDay, fromPeriod, toDay, toPeriod, beforeTaskId = null) {
+      if (!taskId || !fromDay || !fromPeriod || !toDay || !toPeriod) return;
+      if (fromDay === toDay && fromPeriod === toPeriod && !beforeTaskId) return;
+
+      const sourceList = state.days[fromDay][fromPeriod];
+      const fromIndex = sourceList.findIndex((task) => task.id === taskId);
+      if (fromIndex === -1) return;
+
+      const [task] = sourceList.splice(fromIndex, 1);
+      const targetList = state.days[toDay][toPeriod];
+
+      if (!beforeTaskId) {
+        targetList.push(task);
+      } else {
+        const beforeIndex = targetList.findIndex((item) => item.id === beforeTaskId);
+        if (beforeIndex === -1) {
+          targetList.push(task);
+        } else {
+          targetList.splice(beforeIndex, 0, task);
+        }
+      }
+
+      render();
+    }
+
+    function onDragStart(e) {
+      const taskId = e.currentTarget.dataset.id;
+      const day = e.currentTarget.dataset.day;
+      const period = e.currentTarget.dataset.period;
+      dragState = { taskId, day, period };
+      e.currentTarget.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", JSON.stringify(dragState));
+    }
+
+    function onDragEnd(e) {
+      e.currentTarget.classList.remove("dragging");
+      document.querySelectorAll(".task-list").forEach((list) => list.classList.remove("drop-zone"));
+    }
+
+    function onDragOverTask(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    }
+
+    function onDropTask(e) {
+      e.preventDefault();
+      const targetTask = e.currentTarget;
+      const targetId = targetTask.dataset.id;
+      const toDay = targetTask.dataset.day;
+      const toPeriod = targetTask.dataset.period;
+      const source = dragState.taskId ? dragState : JSON.parse(e.dataTransfer.getData("text/plain") || "{}") || {};
+
+      if (!source.taskId || !source.day || !source.period) return;
+      if (source.taskId === targetId && source.day === toDay && source.period === toPeriod) return;
+
+      moveTask(source.taskId, source.day, source.period, toDay, toPeriod, targetId);
+    }
+
+    function bindColumnDrops() {
+      document.querySelectorAll(".task-list").forEach((list) => {
+        list.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          list.classList.add("drop-zone");
+        });
+
+        list.addEventListener("dragleave", () => {
+          list.classList.remove("drop-zone");
+        });
+
+        list.addEventListener("drop", (e) => {
+          e.preventDefault();
+          list.classList.remove("drop-zone");
+
+          const source = dragState.taskId ? dragState : JSON.parse(e.dataTransfer.getData("text/plain") || "{}") || {};
+          if (!source.taskId || !source.day || !source.period) return;
+
+          const toDay = list.id.split("-")[0];
+          const toPeriod = list.id.includes("morning") ? "morning" : "afternoon";
+          moveTask(source.taskId, source.day, source.period, toDay, toPeriod);
+        });
+      });
+    }
+
+    document.addEventListener("click", (e) => {
+      const addBtn = e.target.closest("[data-add-day]");
+      if (addBtn) {
+        addTask(addBtn.dataset.addDay, addBtn.dataset.addPeriod);
+        return;
+      }
+
+      const clearBtn = e.target.closest("[data-clear-day]");
+      if (clearBtn) {
+        clearCompleted(clearBtn.dataset.clearDay, clearBtn.dataset.clearPeriod);
+      }
+    });
+
+    loadState();
+    render();
+  </script>
+</body>
+</html>
